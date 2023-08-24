@@ -23,18 +23,25 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setDotPosition((prevPos) => ({ ...prevPos, y: prevPos.y + gravity }));
-    }, 100);
+      setDotPosition((prevPos) => {
+        const newY = prevPos.y + gravity;
+
+        // Scroll down the window
+        window.scrollBy(0, gravity);
+
+        return { ...prevPos, y: newY };
+      });
+    }, 10);
 
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="App">
-      <div
-        className="dot"
-        style={{ left: `${dotPosition.x}px`, top: `${dotPosition.y}px` }}
-      />
+      <div className="block" style={{ left: '200px', top: '200px' }} />
+      <div className="block" style={{ left: '500px', top: '400px' }} />
+     
+      <div className="dot" style={{ left: `${dotPosition.x}px`, top: `${dotPosition.y}px` }} />
     </div>
   );
 }

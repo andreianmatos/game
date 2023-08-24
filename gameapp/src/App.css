@@ -30,3 +30,11 @@ body {
   background-size: cover;
   position: absolute;
 }
+
+.block {
+  width: 100px; /* Adjust the size as needed */
+  height: 100px; /* Adjust the size as needed */
+  background-color: #333; /* Color of the blocks */
+  opacity: 0.2; /* Adjust the opacity as needed */
+  position: absolute;
+}
