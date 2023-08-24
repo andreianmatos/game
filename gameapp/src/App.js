@@ -1,23 +1,40 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
+  const [dotPosition, setDotPosition] = useState({ x: 100, y: 0 });
+  const gravity = 1;
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'ArrowLeft') {
+        setDotPosition((prevPos) => ({ ...prevPos, x: prevPos.x - 10 }));
+      } else if (event.key === 'ArrowRight') {
+        setDotPosition((prevPos) => ({ ...prevPos, x: prevPos.x + 10 }));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDotPosition((prevPos) => ({ ...prevPos, y: prevPos.y + gravity }));
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div
+        className="dot"
+        style={{ left: `${dotPosition.x}px`, top: `${dotPosition.y}px` }}
+      />
     </div>
   );
 }
