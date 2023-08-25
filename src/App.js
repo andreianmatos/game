@@ -2,10 +2,16 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  const [dotPosition, setDotPosition] = useState({ x: 100, y: 100 }); // Starting at the top
-  const [blockPositions, setBlockPositions] = useState(() => generateRandomPositions()); // Generate random positions for blocks
-
+  const [dotPosition, setDotPosition] = useState({ x: 100, y: 100 });
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [blockPositions, setBlockPositions] = useState(() => generateRandomPositions());
   const [scrollY, setScrollY] = useState(0);
+
+  const images = [
+    './assets/dotButterfly.png',
+    './assets/dotButterfly2.png',
+    './assets/dotButterfly3.png',
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,14 +46,13 @@ function App() {
     const checkCollisions = () => {
       for (const blockPos of blockPositions) {
         if (
-          dotPosition.x < blockPos.left + 100 && // Dot's right edge is to the left of the block's right edge
-          dotPosition.x + 100 > blockPos.left && // Dot's left edge is to the right of the block's left edge
-          dotPosition.y < blockPos.top + 100 + scrollY && // Adjust for scroll
-          dotPosition.y + 100 > blockPos.top + scrollY    // Adjust for scroll
+          dotPosition.x < blockPos.left + 100 &&
+          dotPosition.x + 100 > blockPos.left &&
+          dotPosition.y < blockPos.top + 100 + scrollY &&
+          dotPosition.y + 100 > blockPos.top + scrollY
         ) {
-          // Collision detected, handle it here
-          setScrollY(dotPosition.y + 100 - window.innerHeight / 2); // Adjust the scroll position
-          window.scrollTo(0, scrollY); // Reset scroll position
+          setScrollY(dotPosition.y + 100 - window.innerHeight / 2);
+          window.scrollTo(0, scrollY);
         }
       }
     };
@@ -55,10 +60,25 @@ function App() {
     checkCollisions();
   }, [dotPosition, blockPositions, scrollY]);
 
+  useEffect(() => {
+    
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+      console.log(images[currentImageIndex])
+    }, 1000); 
+
+    return () => clearInterval(interval);
+  }, [images]);
+
   return (
     <div className="App">
-      {/* Butterfly (Dot) */}
-      <div className="dot" style={{ left: `${dotPosition.x}px`, top: `${dotPosition.y}px` }} />
+      {/* Dot */}
+      <div className="dot" style={{ 
+        left: `${dotPosition.x}px`, 
+        top: `${dotPosition.y}px`,
+        //backgroundImage: `url(${require(images[currentImageIndex])})` #not working ???
+        backgroundImage: `url(${require('./assets/dotButterfly.png')})`
+      }} />
 
       {/* Static Blocks */}
       {blockPositions.map((position, index) => (
@@ -70,20 +90,18 @@ function App() {
 
 // Generate random positions for blocks while avoiding collisions
 function generateRandomPositions() {
-  const numBlocks = 2; // Adjust the number of blocks as needed
-  const blockSize = 100; // Adjust the size of the blocks as needed
+  const numBlocks = 2; 
+  const blockSize = 100;
   const positions = [];
 
   for (let i = 0; i < numBlocks; i++) {
     let left, top;
     let isValidPosition = false;
 
-    // Generate positions until a valid position is found
     while (!isValidPosition) {
       left = Math.random() * (window.innerWidth - blockSize);
       top = Math.random() * (window.innerHeight - blockSize);
 
-      // Check for collision with existing blocks
       isValidPosition = positions.every(
         (pos) =>
           left + blockSize < pos.left ||
