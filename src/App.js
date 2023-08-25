@@ -5,6 +5,20 @@ function App() {
   const [dotPosition, setDotPosition] = useState({ x: 100, y: 100 }); // Starting at the top
   const [blockPositions, setBlockPositions] = useState(() => generateRandomPositions()); // Generate random positions for blocks
 
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'ArrowLeft') {
@@ -28,18 +42,18 @@ function App() {
         if (
           dotPosition.x < blockPos.left + 100 && // Dot's right edge is to the left of the block's right edge
           dotPosition.x + 100 > blockPos.left && // Dot's left edge is to the right of the block's left edge
-          dotPosition.y < blockPos.top + 100 && // Dot's bottom edge is above the block's top edge
-          dotPosition.y + 100 > blockPos.top    // Dot's top edge is below the block's bottom edge
+          dotPosition.y < blockPos.top + 100 + scrollY && // Adjust for scroll
+          dotPosition.y + 100 > blockPos.top + scrollY    // Adjust for scroll
         ) {
           // Collision detected, handle it here
-          console.log('Collision with block detected');
-          // For example, you could stop the dot from moving further left or right
+          setScrollY(dotPosition.y + 100 - window.innerHeight / 2); // Adjust the scroll position
+          window.scrollTo(0, scrollY); // Reset scroll position
         }
       }
     };
 
     checkCollisions();
-  }, [dotPosition]);
+  }, [dotPosition, blockPositions, scrollY]);
 
   return (
     <div className="App">
@@ -48,7 +62,7 @@ function App() {
 
       {/* Static Blocks */}
       {blockPositions.map((position, index) => (
-        <div key={index} className="block" style={position} />
+        <div key={index} className="block" style={{ ...position, top: position.top + scrollY }} />
       ))}
     </div>
   );
@@ -59,7 +73,6 @@ function generateRandomPositions() {
   const numBlocks = 2; // Adjust the number of blocks as needed
   const blockSize = 100; // Adjust the size of the blocks as needed
   const positions = [];
-  const scrollY = window.scrollY; // Current scroll position
 
   for (let i = 0; i < numBlocks; i++) {
     let left, top;
@@ -68,7 +81,7 @@ function generateRandomPositions() {
     // Generate positions until a valid position is found
     while (!isValidPosition) {
       left = Math.random() * (window.innerWidth - blockSize);
-      top = Math.random() * (window.innerHeight - blockSize) + scrollY; // Adjust for scroll
+      top = Math.random() * (window.innerHeight - blockSize);
 
       // Check for collision with existing blocks
       isValidPosition = positions.every(
