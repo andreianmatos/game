@@ -7,19 +7,27 @@ body {
   align-items: center;
   height: 100vh;
   overflow: hidden;
-  animation: gradientAnimation 10s linear infinite;
+  animation: gradientScrollAnimation 20s linear infinite;
+  background: linear-gradient(-45deg, #ff6b6b, #556270, #6a82fb, #fa9d05);
 }
 
-@keyframes gradientAnimation {
+@keyframes gradientScrollAnimation {
   0% {
-    background: linear-gradient(-45deg, #ff6b6b, #556270, #6a82fb, #fa9d05);
-    background-size: 400% 400%;
     background-position: 0% 50%;
+    transform: translateY(0);
   }
   100% {
-    background: linear-gradient(-45deg, #ff6b6b, #556270, #6a82fb, #fa9d05);
-    background-size: 400% 400%;
     background-position: 100% 50%;
+    transform: translateY(-100vh);
+  }
+}
+
+@keyframes dotScrollAnimation {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100vh);
   }
 }
 
@@ -29,6 +37,7 @@ body {
   background-image: url("/assets/mainButterfly.png"); /* Replace with your image path */
   background-size: cover;
   position: absolute;
+  animation: dotScrollAnimation 20s linear infinite;
 }
 
 .block {
